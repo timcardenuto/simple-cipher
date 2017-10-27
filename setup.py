@@ -8,6 +8,6 @@ setup(name='simple_cipher',
       author_email='timcardenuto@gmail.com',
       license='MIT',
       packages=['simple_cipher'],
-      install_requires=['pyenchant','numpy','sys','math','re'],
+      install_requires=['pyenchant','numpy'],
       zip_safe=False)
 	  

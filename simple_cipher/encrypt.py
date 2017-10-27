@@ -11,10 +11,10 @@
 # to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
 # copies of the Software, and to permit persons to whom the Software is
 # furnished to do so, subject to the following conditions:
-# 
+#
 # The above copyright notice and this permission notice shall be included in all
 # copies or substantial portions of the Software.
-# 
+#
 # THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
 # IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
 # FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
@@ -33,20 +33,24 @@ import convert
 import lfsr
 
 
-def encrypt(cleartext):
-	# convert ascii characters to decimal 
+def encrypt(taps, fill, key, cleartext):
+	# convert ascii characters to decimal
 	decimal_ascii = convert.ASCIIToDecimal(cleartext)
-	
+
 	# encrypt word with shift based on 'key' between 1 and 25 shifts
-	key = 3
+	#key = 3
 	shifted_decimal = convert.shiftRightDecimalASCII(decimal_ascii,key)
 
 	# convert decimal value to binary
 	binary = convert.DecimalASCIIToBinary(shifted_decimal)
 
 	# XOR binary with 4th order polynomial PRN
-	fill = [1, 0, 1, 0]
-	seq = lfsr.four(fill)
+	#fill = [1, 0, 1, 0]
+	#taps = [4, 1, 0]
+	#seq = lfsr.four(fill)
+	order = taps[0]
+	taps.pop(0)
+	seq = lfsr.generic(order, taps, fill)
 	binary_xor = np.zeros(len(binary), dtype = np.int)
 	j=0
 	for index, bit in enumerate(binary):
@@ -65,13 +69,19 @@ def encrypt(cleartext):
 			encrypted_hex[index] = encrypted_hex[index][:-1]
 	print("Encrypted: ", str(''.join(encrypted_hex)))
 
-	
+
 if __name__ == "__main__":
 	#cleartext = 'ROSEBUD'   # should produce 'FA41086EF9153F'
 	text = []
 	for i in range(1,len(sys.argv)):
 		text.append(list(sys.argv[i]))
 	cleartext = [item for sublist in text for item in sublist]
-	
+
+	taps = [4, 1, 0]
+	fill = [1, 0, 1, 0]
+	key = 3
+	print("Taps: ", taps)
+	print("Fill: ", fill)
+	print("Key:  ", key)
 	print("ClearText: ", cleartext)
-	encrypt(cleartext)
+	encrypt(taps, fill, key, cleartext)
